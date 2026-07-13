@@ -1,0 +1,61 @@
+# Configuration for the ADB 2048 bot.
+# Coordinates are in the *screenshot* resolution reported by `adb screencap`
+# (for the reference device that is 1080x2400). Tune the geometry block with
+# `python calibrate.py` until the overlay grid lines up with the tiles.
+
+device:
+  serial: null          # e.g. "emulator-5554" or a USB serial; null = first device
+  adb_path: adb
+
+# Where the 16 cells are on screen.
+geometry:
+  first_center_x: 216   # centre X of the top-left cell (row 0, col 0)
+  first_center_y: 894   # centre Y of the top-left cell
+  pitch_x: 210          # horizontal distance between adjacent cell centres
+  pitch_y: 210          # vertical distance between adjacent cell centres
+  cell_size: 150        # side of the square sampled inside each cell
+
+vision:
+  reader: ocr           # "ocr" (needs tesseract) or "color"
+  empty_luma_max: 55    # a cell darker than this (and no white pixels) is empty
+  # Only used when reader == "color". Learn it with:
+  #   python calibrate.py --learn-colors
+  color_palette: {}     # e.g. { 2: [58,58,64], 8: [40,130,230], ... }
+
+# Standard 2048 spawn odds: mostly 2s, occasionally 4s.
+# (If you ever confirm a variant that spawns 8s, adjust these odds accordingly.)
+spawn_distribution:
+  2: 0.9
+  4: 0.1
+
+solver:
+  max_depth: 5          # expectimax depth on tight boards; auto-reduced when open
+  chance_branch_cap: 6  # max empty cells expanded at a chance node
+
+timing:
+  base_min: 0.09
+  base_max: 0.22
+  long_pause_chance: 0.06
+  long_pause_min: 0.5
+  long_pause_max: 1.4
+
+swipe:
+  distance: 320
+  distance_jitter: 0.18
+  start_jitter: 26
+  angle_jitter_deg: 6.0
+  duration_min: 45
+  duration_max: 95
+  # Centre of the board = swipe origin. Defaults to the middle of the 4x4 grid
+  # derived from geometry, but you can override here if needed.
+  center_x: null
+  center_y: null
+
+game:
+  # Tap target for the "Нова гра" (New game) button after a game over.
+  new_game_button: [540, 2180]
+  max_tries: 50          # how many games to play in one run
+  # After a move, if the board is unchanged we treat the move as illegal and
+  # try the next-best direction. This many illegal moves in a row = game over.
+  stuck_threshold: 4
+  read_settle_s: 0.12    # small wait after a swipe before re-reading the screen

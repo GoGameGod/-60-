@@ -1,0 +1,6 @@
+Pillow>=10.0
+numpy>=1.24
+PyYAML>=6.0
+# Optional: only needed for vision.reader == "ocr".
+# Also install the system binary:  apt install tesseract-ocr  (or brew install tesseract)
+pytesseract>=0.3.10
