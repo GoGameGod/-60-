@@ -72,6 +72,7 @@ def build_reader(cfg: dict, geo: Geometry) -> BoardReader:
         reader=v.get("reader", "ocr"),
         color_palette=palette,
         empty_luma_max=v.get("empty_luma_max", 55),
+        tesseract_cmd=v.get("tesseract_cmd"),
     )
 
 

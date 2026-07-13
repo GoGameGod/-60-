@@ -70,11 +70,13 @@ class BoardReader:
         reader: str = "ocr",
         color_palette: Optional[Dict[int, Tuple[int, int, int]]] = None,
         empty_luma_max: int = 55,
+        tesseract_cmd: Optional[str] = None,
     ):
         self.geo = geometry
         self.reader = reader
         self.color_palette = color_palette or {}
         self.empty_luma_max = empty_luma_max
+        self.tesseract_cmd = tesseract_cmd
         self._ocr_ready = False
         if reader == "ocr":
             self._init_ocr()
@@ -83,11 +85,17 @@ class BoardReader:
         try:
             import pytesseract  # noqa: F401
             self._pytesseract = pytesseract
+            # Windows users can point straight at tesseract.exe instead of PATH,
+            # e.g. C:\Program Files\Tesseract-OCR\tesseract.exe
+            if self.tesseract_cmd:
+                pytesseract.pytesseract.tesseract_cmd = self.tesseract_cmd
             self._ocr_ready = True
         except Exception as exc:  # pragma: no cover - environment dependent
             raise RuntimeError(
-                "reader='ocr' requires pytesseract and the tesseract binary "
-                "(e.g. `pip install pytesseract` + `apt install tesseract-ocr`). "
+                "reader='ocr' requires pytesseract and the tesseract binary. "
+                "Windows: install from https://github.com/UB-Mannheim/tesseract/wiki "
+                "and set vision.tesseract_cmd in config.yaml. "
+                "Linux: apt install tesseract-ocr. "
                 f"Import failed: {exc}"
             )
 

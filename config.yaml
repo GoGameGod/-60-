@@ -35,6 +35,9 @@ geometry:
 vision:
   reader: ocr           # "ocr" (needs tesseract) or "color"
   empty_luma_max: 55    # a cell darker than this (and no white pixels) is empty
+  # Windows: full path to tesseract.exe if it is not on PATH. Leave null on
+  # Linux/macOS (or if tesseract is on PATH).
+  tesseract_cmd: null   # e.g. "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
   # Only used when reader == "color". Learn it with:
   #   python calibrate.py --learn-colors
   # Confirmed from the reference screenshot: 2 -> gray, 8 -> blue. Add the rest
