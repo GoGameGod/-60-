@@ -52,12 +52,17 @@ class Bot:
         timing: TimingProfile,
         swipe: SwipeProfile,
         config: BotConfig,
+        capture=None,
         rng: Optional[random.Random] = None,
         on_move=None,
         on_game_end=None,
     ):
         self.adb = adb
         self.reader = reader
+        # `capture` returns a top-down board image (PIL). Defaults to a screenshot,
+        # but for secure apps it is a CameraSource.grab that reads the screen
+        # optically. Input (swipe/tap) always goes through adb regardless.
+        self.capture = capture or adb.screencap
         self.solver = solver
         self.timing = timing
         self.swipe = swipe
@@ -127,7 +132,7 @@ class Bot:
 
     # -- primitives --------------------------------------------------------- #
     def _read(self) -> Board:
-        return self.reader.read(self.adb.screencap())
+        return self.reader.read(self.capture())
 
     def _do_swipe(self, direction: str) -> None:
         x1, y1, x2, y2, dur = self.swipe.gesture(direction, self.rng)

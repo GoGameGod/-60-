@@ -7,6 +7,23 @@ device:
   serial: null          # e.g. "emulator-5554" or a USB serial; null = first device
   adb_path: adb
 
+# How the bot READS the board. Input (swipes) always uses adb.
+#   screencap -> adb screencap. Fails on "secure" apps (returns a black frame).
+#   camera    -> read the screen optically with a webcam. Use this for the
+#                FLAG_SECURE / screenshot-blocked 2048 build.
+source: camera
+
+camera:
+  index: 0              # webcam index (0 = default). A phone-as-webcam works too.
+  warp_size: 640        # side of the perspective-corrected board image
+  cell_fill: 0.6        # fraction of a cell sampled (avoids borders)
+  flush_frames: 3       # frames to drop per grab to get the latest image
+  capture_width: null   # force a camera resolution, e.g. 1920
+  capture_height: null
+  # Board corners in the camera image, order TL, TR, BR, BL.
+  # Fill these with `python calibrate.py --camera` (interactive picker).
+  corners: null         # e.g. [[210,140],[900,150],[890,830],[200,820]]
+
 # Where the 16 cells are on screen.
 geometry:
   first_center_x: 216   # centre X of the top-left cell (row 0, col 0)
@@ -38,6 +55,23 @@ timing:
   long_pause_chance: 0.06
   long_pause_min: 0.5
   long_pause_max: 1.4
+
+# Switchable presets. Pick one with `python main.py --mode <name>`; the chosen
+# preset is deep-merged over the base `solver`/`timing` blocks above.
+#   balanced -> fast predictive-ish play, strong result (default)
+#   record   -> deeper search, more deliberate pauses -> highest tile
+#   speed    -> shallow search, minimal pauses -> most games per minute
+default_mode: balanced
+modes:
+  balanced:
+    solver: { max_depth: 5 }
+    timing: { base_min: 0.09, base_max: 0.22, long_pause_chance: 0.06 }
+  record:
+    solver: { max_depth: 7 }
+    timing: { base_min: 0.12, base_max: 0.30, long_pause_chance: 0.10, long_pause_max: 1.8 }
+  speed:
+    solver: { max_depth: 3 }
+    timing: { base_min: 0.05, base_max: 0.12, long_pause_chance: 0.02, long_pause_max: 0.6 }
 
 swipe:
   distance: 320

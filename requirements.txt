@@ -4,3 +4,5 @@ PyYAML>=6.0
 # Optional: only needed for vision.reader == "ocr".
 # Also install the system binary:  apt install tesseract-ocr  (or brew install tesseract)
 pytesseract>=0.3.10
+# Optional: only needed for source: camera (the screenshot-blocked "secure" app).
+opencv-python>=4.8
