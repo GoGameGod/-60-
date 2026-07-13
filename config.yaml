@@ -8,10 +8,10 @@ device:
   adb_path: adb
 
 # How the bot READS the board. Input (swipes) always uses adb.
-#   screencap -> adb screencap. Fails on "secure" apps (returns a black frame).
-#   camera    -> read the screen optically with a webcam. Use this for the
-#                FLAG_SECURE / screenshot-blocked 2048 build.
-source: camera
+#   screencap -> adb screencap (this app allows screenshots -> use this).
+#   camera    -> optical fallback with a webcam, only if a build ever blocks
+#                screenshots (FLAG_SECURE, black frames).
+source: screencap
 
 camera:
   index: 0              # webcam index (0 = default). A phone-as-webcam works too.
@@ -37,7 +37,9 @@ vision:
   empty_luma_max: 55    # a cell darker than this (and no white pixels) is empty
   # Only used when reader == "color". Learn it with:
   #   python calibrate.py --learn-colors
-  color_palette: {}     # e.g. { 2: [58,58,64], 8: [40,130,230], ... }
+  # Confirmed from the reference screenshot: 2 -> gray, 8 -> blue. Add the rest
+  # (4, 16, 32, ...) with the calibrator if you want to run reader: color.
+  color_palette: {}     # e.g. { 2: [78,78,90], 8: [67,145,222], ... }
 
 # Standard 2048 spawn odds: mostly 2s, occasionally 4s.
 # (If you ever confirm a variant that spawns 8s, adjust these odds accordingly.)
@@ -87,7 +89,8 @@ swipe:
 
 game:
   # Tap target for the "Нова гра" (New game) button after a game over.
-  new_game_button: [540, 2180]
+  # Estimated from the 1080x2400 reference screenshot; verify with "Show taps".
+  new_game_button: [540, 2230]
   max_tries: 50          # how many games to play in one run
   # After a move, if the board is unchanged we treat the move as illegal and
   # try the next-best direction. This many illegal moves in a row = game over.
